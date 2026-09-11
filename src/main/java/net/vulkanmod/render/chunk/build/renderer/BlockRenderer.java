@@ -119,7 +119,8 @@ public class BlockRenderer extends AbstractBlockRenderContext {
         int[] lights = quadLightData.lm;
 
         // Rotate triangles if needed to fix AO anisotropy
-        int idx = QuadUtils.getIterationStartIdx(brightnessArr, lights);
+        // Minimal winding test: force idx = 0
+        int idx = 0;
 
         bufferBuilder.ensureCapacity();
 
