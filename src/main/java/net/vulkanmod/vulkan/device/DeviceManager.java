@@ -24,7 +24,7 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.vulkan.EXTDebugUtils.VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
 import static org.lwjgl.vulkan.KHRSurface.*;
 import static org.lwjgl.vulkan.VK10.*;
-import static org.lwjgl.vulkan.VK12.VK_API_VERSION_1_2;
+import static org.lwjgl.vulkan.VK11.VK_API_VERSION_1_1;
 
 public abstract class DeviceManager {
     public static List<Device> availableDevices;
@@ -175,10 +175,6 @@ public abstract class DeviceManager {
             deviceVulkan11Features.sType$Default();
             deviceVulkan11Features.shaderDrawParameters(device.isDrawIndirectSupported());
 
-            VkPhysicalDeviceVulkan12Features deviceVulkan12Features = VkPhysicalDeviceVulkan12Features.calloc(stack);
-            deviceVulkan12Features.sType$Default();
-            deviceVulkan12Features.hostQueryReset(true);
-
             VkPhysicalDeviceFeatures2 deviceFeatures = VkPhysicalDeviceFeatures2.calloc(stack);
             deviceFeatures.sType$Default();
             deviceFeatures.features().samplerAnisotropy(device.availableFeatures.features().samplerAnisotropy());
@@ -192,25 +188,12 @@ public abstract class DeviceManager {
                 VRenderSystem.canSetLineWidth = true;
             }
 
-            if (device.availableFeatures12.samplerFilterMinmax()) {
-                deviceVulkan12Features.samplerFilterMinmax(true);
-            }
-
             VkDeviceCreateInfo createInfo = VkDeviceCreateInfo.calloc(stack);
             createInfo.sType$Default();
             createInfo.sType(VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO);
             createInfo.pQueueCreateInfos(queueCreateInfos);
             createInfo.pEnabledFeatures(deviceFeatures.features());
             createInfo.pNext(deviceVulkan11Features);
-            createInfo.pNext(deviceVulkan12Features);
-
-            if (Vulkan.DYNAMIC_RENDERING) {
-                VkPhysicalDeviceDynamicRenderingFeaturesKHR dynamicRenderingFeaturesKHR = VkPhysicalDeviceDynamicRenderingFeaturesKHR.calloc(stack);
-                dynamicRenderingFeaturesKHR.sType$Default();
-                dynamicRenderingFeaturesKHR.dynamicRendering(true);
-
-                deviceVulkan11Features.pNext(dynamicRenderingFeaturesKHR.address());
-            }
 
             HashSet<String> enabledExtensions = new HashSet<>(Vulkan.REQUIRED_DEVICE_EXTENSIONS);
 
@@ -247,7 +230,7 @@ public abstract class DeviceManager {
             int res = vkCreateDevice(physicalDevice, createInfo, null, pDevice);
             Vulkan.checkResult(res, "Failed to create logical device");
 
-            vkDevice = new VkDevice(pDevice.get(0), physicalDevice, createInfo, VK_API_VERSION_1_2);
+            vkDevice = new VkDevice(pDevice.get(0), physicalDevice, createInfo, VK_API_VERSION_1_1);
 
             graphicsQueue = new GraphicsQueue(stack, indices.graphicsFamily);
             transferQueue = new TransferQueue(stack, indices.transferFamily);
