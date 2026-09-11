@@ -107,7 +107,9 @@ public class GraphicsPipeline extends Pipeline {
             // ===> RASTERIZATION STAGE <===
 
             final int polygonMode = PipelineState.AssemblyRasterState.decodePolygonMode(state.assemblyRasterState);
-            final int cullMode = PipelineState.AssemblyRasterState.decodeCullMode(state.assemblyRasterState);
+            // DIAGNOSTIC TEST: force no culling to check if back-face culling causes missing terrain faces on PowerVR GE8320.
+            // Original line: final int cullMode = PipelineState.AssemblyRasterState.decodeCullMode(state.assemblyRasterState);
+            final int cullMode = VK_CULL_MODE_NONE;
 
             VkPipelineRasterizationStateCreateInfo rasterizer = VkPipelineRasterizationStateCreateInfo.calloc(stack);
             rasterizer.sType(VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO);
