@@ -8,7 +8,6 @@ layout(std140) uniform SpriteAnimationInfo {
     int MipMapLevel;
 };
 
-out float fAnimationProgress;
 out vec2 texCoord0;
 
 const vec2[] positions = vec2[](
@@ -28,5 +27,4 @@ void main() {
     vec2 uv = positions[index];
     vec2 direction = uv * 2.0 - 1.0;
     texCoord0 = uv + (padding * direction);
-    fAnimationProgress = frameProgress;
 }
