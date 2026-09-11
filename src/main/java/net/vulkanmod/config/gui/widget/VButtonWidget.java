@@ -3,10 +3,12 @@ package net.vulkanmod.config.gui.widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
+import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.vulkanmod.config.gui.util.VGuiConstants;
 import net.vulkanmod.config.gui.render.GuiRenderer;
+import net.vulkanmod.render.shader.CustomRenderPipelines;
 import net.vulkanmod.vulkan.util.ColorUtil;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +40,19 @@ public class VButtonWidget extends VAbstractWidget {
         int selectionOutlineColor = ColorUtil.ARGB.multiplyAlpha(VGuiConstants.COLOR_RED, 0.8f);
         int selectionFillColor = ColorUtil.ARGB.multiplyAlpha(VGuiConstants.COLOR_RED, 0.2f);
 
-        GuiRenderer.fill(this.x, this.y, this.x + this.width, this.y + this.height, backgroundColor);
+        // DIAGNOSTIC TEST: Replace vanilla fill() with GUI_TRIANGLES submitPolygon()
+        // This tests if the problem is in the vanilla GuiGraphics.fill() pathway
+        float[][] backgroundVertices = new float[][]{
+                // Triangle 1: top-left, top-right, bottom-right
+                {this.x, this.y},
+                {this.x + this.width, this.y},
+                {this.x + this.width, this.y + this.height},
+                // Triangle 2: top-left, bottom-right, bottom-left
+                {this.x, this.y},
+                {this.x + this.width, this.y + this.height},
+                {this.x, this.y + this.height},
+        };
+        GuiRenderer.submitPolygon(CustomRenderPipelines.GUI_TRIANGLES, TextureSetup.noTexture(), backgroundVertices, backgroundColor);
 
         if (this.selected) {
             GuiRenderer.fill(this.x, this.y, this.x + 2, this.y + this.height, selectionOutlineColor);
