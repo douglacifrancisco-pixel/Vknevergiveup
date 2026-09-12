@@ -143,7 +143,12 @@ public class GraphicsPipeline extends Pipeline {
             // ===> COLOR BLENDING <===
 
             VkPipelineColorBlendAttachmentState.Buffer colorBlendAttachment = VkPipelineColorBlendAttachmentState.calloc(1, stack);
-            colorBlendAttachment.colorWriteMask(state.colorMask_i);
+            colorBlendAttachment.colorWriteMask(
+    VK_COLOR_COMPONENT_R_BIT |
+    VK_COLOR_COMPONENT_G_BIT |
+    VK_COLOR_COMPONENT_B_BIT |
+    VK_COLOR_COMPONENT_A_BIT
+);
 
             if (PipelineState.BlendState.enable(state.blendState_i)) {
                 colorBlendAttachment.blendEnable(true);
